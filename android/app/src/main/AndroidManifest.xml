@@ -1,5 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.ekos_01.ekos_01">
+    <uses-permission android:name="android.permission.INTERNET"/>
    <application
         android:label="ekos_01"
         android:icon="@mipmap/ic_launcher">
