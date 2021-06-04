@@ -30,6 +30,12 @@ class AuthModel extends ChangeNotifier {
   UserModel get user => _user;
   bool get isGuest => _isGuest;
 
+  void autoLogin(UserModel user) {
+    _user = user;
+    _isGuest = false;
+    notifyListeners();
+  }
+
   void logout() {
     _user = null;
     _isGuest = true;

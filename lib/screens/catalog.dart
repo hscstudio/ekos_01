@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ekos_01/models/cart.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 final formatCurrency = new NumberFormat.simpleCurrency(locale: 'id_ID');
 
@@ -37,22 +38,29 @@ class _MyCatalogState extends State<MyCatalog> {
             child: FutureBuilder<List<ProductModel>>(
               future: futureProducts,
               builder: (BuildContext context, AsyncSnapshot snapshot) {
-                if (snapshot.data == null) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
                   return new Container(
                     child: Center(child: new CircularProgressIndicator()),
                   );
                 } else {
-                  return Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: ListView.builder(
-                      scrollDirection: Axis.vertical,
-                      shrinkWrap: true,
-                      itemCount: snapshot.data.length,
-                      itemBuilder: (BuildContext content, int index) {
-                        return _MyListItem(snapshot.data[index]);
-                      },
-                    ),
-                  );
+                  if (snapshot.data == null) {
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text('Data not found'),
+                    );
+                  } else {
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: ListView.builder(
+                        scrollDirection: Axis.vertical,
+                        shrinkWrap: true,
+                        itemCount: snapshot.data.length,
+                        itemBuilder: (BuildContext content, int index) {
+                          return _MyListItem(snapshot.data[index]);
+                        },
+                      ),
+                    );
+                  }
                 }
               },
             ),
@@ -91,6 +99,7 @@ class _MyCatalogState extends State<MyCatalog> {
                   // ...
                   // Then close the drawer
                   Navigator.pop(context);
+                  Navigator.pushNamed(context, '/profile');
                 },
               ),
             ),
@@ -99,7 +108,14 @@ class _MyCatalogState extends State<MyCatalog> {
               child: ListTile(
                 title: Text('Logout'),
                 leading: const Icon(Icons.power_settings_new),
-                onTap: () {
+                onTap: () async {
+                  SharedPreferences prefs =
+                      await SharedPreferences.getInstance();
+                  prefs.setString('id', '');
+                  prefs.setString('username', '');
+                  prefs.setString('password', '');
+                  prefs.setString('name', '');
+                  prefs.setString('avatar', '');
                   auth.logout();
                   Navigator.pushReplacementNamed(context, '/');
                   // Then close the drawer
